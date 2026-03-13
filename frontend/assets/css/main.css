@@ -1,0 +1,28 @@
+body {
+  min-height: 100vh;
+}
+
+.card {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.qr-card {
+  max-width: 420px;
+}
+
+.flow-card {
+  max-width: 480px;
+}
+
+.qr-placeholder {
+  display: flex;
+  justify-content: center;
+}
+
+.qr-square {
+  width: 140px;
+  height: 140px;
+  border-radius: 8px;
+  border: 3px dashed #0d6efd;
+}
