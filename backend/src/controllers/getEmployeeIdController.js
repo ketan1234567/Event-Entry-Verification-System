@@ -1,35 +1,35 @@
 // GET /get-employee-id - fetch employee ID and name from employees (signup) table
-const pool = require('../config/db');
+const pool = require('../config/db'); // You named it 'pool'
 
-async function getEmployeeId(req, res, next) {
-  try {
+async function getEmployeeId(req, res) {
     const { employeeId } = req.query;
 
     if (!employeeId) {
-      return res.status(400).json({ error: 'EMPLOYEE_ID_REQUIRED' });
+        return res.status(400).json({ error: 'Employee ID is required' });
     }
 
-    const [rows] = await pool.execute(
-      `SELECT employee_id, first_name, last_name
-       FROM employees
-       WHERE employee_id = ?`,
-      [employeeId.trim()]
-    );
+    try {
+        // Correct SQL query
+        const query = 'SELECT employeeId, name FROM employees WHERE employeeId = ?';
+        
+        // ✅ FIX: Use 'pool' here, not 'db'
+        const [rows] = await pool.query(query, [employeeId]);
 
-    if (!rows.length) {
-      return res.status(404).json({ error: 'EMPLOYEE_NOT_FOUND' });
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+
+        const employee = rows[0];
+
+        res.json({
+            employeeId: employee.employeeId,
+            name: employee.name 
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
     }
-
-    const emp = rows[0];
-    const name = [emp.first_name, emp.last_name].filter(Boolean).join(' ').trim() || null;
-
-    res.json({
-      employeeId: emp.employee_id,
-      name: name || emp.employee_id,
-    });
-  } catch (err) {
-    next(err);
-  }
 }
 
 module.exports = { getEmployeeId };

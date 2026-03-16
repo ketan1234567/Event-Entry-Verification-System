@@ -1,20 +1,35 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const path = require('path');               // <-- add this
+const path = require('path');
 const publicRoutes = require('./routes/publicRoutes');
 
 const app = express();
 
-app.use(helmet());
-app.use(express.json());
-app.use(cors());
+// 1. CORS Configuration
+app.use(cors({
+  origin: '*', // Allow all origins for development
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 
-// Serve uploaded files (selfies)
+// 2. Helmet Configuration (FIX: Allow Cross-Origin Resources)
+// This prevents the browser from blocking the error response JSON
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Increase request size limit for selfie uploads
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
+
+// Serve uploaded selfie images
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
+// Routes
 app.use('/api/public', publicRoutes);
 
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: 'INTERNAL_ERROR' });

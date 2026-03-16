@@ -1,0 +1,56 @@
+
+
+let stream;
+
+
+// Load Face Detection Model
+Promise.all([
+  faceapi.nets.tinyFaceDetector.loadFromUri('/models')
+]).then(startCamera);
+
+
+// Start Camera
+async function startCamera(){
+
+stream = await navigator.mediaDevices.getUserMedia({
+video:{facingMode:"user"},
+audio:false
+});
+
+video.srcObject = stream;
+
+video.onloadedmetadata = () => {
+detectFace();
+};
+
+}
+
+
+// Detect Face Continuously
+async function detectFace(){
+
+const detection = await faceapi.detectSingleFace(
+video,
+new faceapi.TinyFaceDetectorOptions()
+);
+
+if(detection){
+
+faceGuide.classList.remove("face-missing");
+faceGuide.classList.add("face-detected");
+
+cameraMessage.textContent = "Face detected ✔";
+
+}else{
+
+faceGuide.classList.remove("face-detected");
+faceGuide.classList.add("face-missing");
+
+cameraMessage.textContent = "Align your face inside the circle";
+
+}
+
+requestAnimationFrame(detectFace);
+
+}
+

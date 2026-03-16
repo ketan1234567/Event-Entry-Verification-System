@@ -1,50 +1,73 @@
 (function () {
-  const params = new URLSearchParams(window.location.search);
-  // Use employeeId from URL, or fetch from sessionStorage (e.g. after signup redirect)
-  let employeeId = params.get('employeeId') || sessionStorage.getItem('eevs_employeeId') || null;
+  // 1. Get elements
+const empNameEl = document.getElementById('empName');
+const empIdEl = document.getElementById('empId');
+const gateCodeInput = document.getElementById('gateCode');
+const btnSubmit = document.getElementById('btnSubmitCode');
+const timerEl = document.getElementById('timer');
+const messageEl = document.getElementById('message');
 
-  const empNameEl = document.getElementById('empName');
-  const empIdEl = document.getElementById('empId');
-  const gateCodeInput = document.getElementById('gateCode');
-  const btnSubmit = document.getElementById('btnSubmitCode');
-  const timerEl = document.getElementById('timer');
-  const messageEl = document.getElementById('message');
+// 2. Get ID from URL (fallback) or LocalStorage (primary source)
+const params = new URLSearchParams(window.location.search);
 
-  let remainingSeconds = 20;
-  let timerInterval = null;
-  let expired = false;
+// FIX: Check 'localStorage' because that is where sign-in.html saved it
+let employeeId = params.get('employeeId') || localStorage.getItem('employeeId') || null;
 
-  // 1) Fetch employee ID and name from backend (GET /get-employee-id) and display
-  async function loadProfile() {
-    if (!employeeId) {
-      empNameEl.textContent = '—';
-      empIdEl.textContent = 'Employee ID: —';
-      return;
-    }
-    try {
-      const res = await fetch(
-        `/api/public/get-employee-id?employeeId=${encodeURIComponent(employeeId)}`
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        empNameEl.textContent = '—';
-        empIdEl.textContent = `Employee ID: ${employeeId}`;
-        messageEl.textContent = data.error || 'Unable to load employee.';
+let remainingSeconds = 20;
+let timerInterval = null;
+let expired = false;
+
+// 3. Function to fetch Name from Backend
+async function loadProfile() {
+    // Safety check: If elements missing, stop
+    if (!empIdEl || !empNameEl) {
+        console.error("HTML elements for ID or Name not found!");
         return;
-      }
-      empNameEl.textContent = data.name || '—';
-      empIdEl.textContent = `Employee ID: ${data.employeeId}`;
-      sessionStorage.setItem('eevs_employee_profile', JSON.stringify({
-        employeeId: data.employeeId,
-        fullName: data.name,
-        selfiePath: null,
-      }));
-    } catch (err) {
-      empNameEl.textContent = '—';
-      empIdEl.textContent = employeeId ? `Employee ID: ${employeeId}` : 'Employee ID: —';
-      messageEl.textContent = 'Network error while loading employee.';
     }
-  }
+
+    if (!employeeId) {
+        empNameEl.textContent = '—';
+        empIdEl.textContent = 'Employee ID: —';
+        messageEl.textContent = "No Employee ID found. Please sign in again.";
+        return;
+    }
+
+    // Display the ID immediately (we already have it)
+    empIdEl.textContent = `Employee ID: ${employeeId}`;
+
+    try {
+        // Fetch name from Node.js backend
+        const res = await fetch(
+            `/api/public/get-employee-id?employeeId=${encodeURIComponent(employeeId)}`
+        );
+        
+        const data = await res.json();
+
+        if (!res.ok) {
+            empNameEl.textContent = 'Unknown';
+            messageEl.textContent = data.error || 'Could not load profile.';
+            return;
+        }
+
+        // Display the Name from Database
+        empNameEl.textContent = data.name || 'Unknown';
+        
+        // Optional: Save profile to session for later use
+        sessionStorage.setItem('eevs_employee_profile', JSON.stringify({
+            employeeId: data.employeeId,
+            fullName: data.name,
+            selfiePath: null,
+        }));
+
+    } catch (err) {
+        console.error("Network Error:", err);
+        empNameEl.textContent = 'Error';
+        messageEl.textContent = 'Network error loading profile.';
+    }
+}
+
+// 4. Run the function when page loads
+
 
   // 2) 20-second countdown — always runs
   function startTimer() {

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Event Entry Verification</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+
+body{
+background: radial-gradient(circle,#3b0000,#000);
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+font-family:system-ui;
+color:white;
+}
+
+.mobile-card{
+max-width:420px;
+width:100%;
+background:rgba(0,0,0,0.7);
+border-radius:20px;
+padding:25px;
+box-shadow:0 0 30px red;
+}
+
+.logo{
+text-align:center;
+color:#ff3b3b;
+font-size:22px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+.employee-box{
+background:#2b0000;
+border:1px solid #ff3b3b;
+border-radius:10px;
+color:white;
+text-align:center;
+}
+
+.btn-red{
+background:linear-gradient(180deg,#ff2a2a,#990000);
+border:none;
+border-radius:10px;
+padding:12px;
+width:100%;
+font-weight:bold;
+color:white;
+margin-top:15px;
+}
+
+.btn-red:hover{
+background:#ff0000;
+}
+
+.camera-container{
+margin-top:20px;
+position:relative;
+}
+
+video{
+width:100%;
+border-radius:10px;
+}
+
+#faceGuide{
+position:absolute;
+width:200px;
+height:200px;
+border:3px dashed #00ff99;
+border-radius:50%;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+pointer-events:none;
+}
+
+.message{
+margin-top:10px;
+font-size:14px;
+text-align:center;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="mobile-card">
+
+<div class="logo">ONDIRECT</div>
+
+<form id="signupForm">
+
+<label class="form-label">Employee ID</label>
+
+<input 
+id="employeeId"
+name="employeeId"
+class="form-control"
+placeholder="Enter Employee ID"
+required
+pattern="[0-9]+"
+inputmode="numeric"
+>
+
+
+<div class="camera-container">
+
+<video id="video" autoplay playsinline style="display:none"></video>
+
+<div id="faceGuide"></div>
+
+<img id="selfiePreview" style="display:none;width:100%;border-radius:10px">
+
+<canvas id="canvas" style="display:none"></canvas>
+
+</div>
+
+
+<button
+type="button"
+id="btnTakeSelfie"
+class="btn-red"
+disabled
+>
+Take Selfie
+</button>
+
+
+<input type="hidden" id="selfieData" name="selfieData">
+
+
+<button
+type="submit"
+id="btnSubmit"
+class="btn-red"
+disabled
+>
+SUBMIT
+</button>
+
+
+<div id="cameraMessage" class="message"></div>
+<div id="formMessage" class="message"></div>
+
+</form>
+
+</div>
+
+
+<script>
+
+// DOM Elements
+const employeeInput = document.getElementById("employeeId");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const preview = document.getElementById("selfiePreview");
+
+const btnTakeSelfie = document.getElementById("btnTakeSelfie");
+const btnSubmit = document.getElementById("btnSubmit");
+
+const selfieDataInput = document.getElementById("selfieData");
+
+const cameraMessage = document.getElementById("cameraMessage");
+const formMessage = document.getElementById("formMessage");
+
+const signupForm = document.getElementById("signupForm");
+
+let stream;
+
+
+// OPEN CAMERA AFTER EMPLOYEE ID
+employeeInput.addEventListener("change", async () => {
+
+if(!employeeInput.value) return;
+
+try{
+
+stream = await navigator.mediaDevices.getUserMedia({
+video:{facingMode:"user"},
+audio:false
+});
+
+video.srcObject = stream;
+video.style.display = "block";
+
+btnTakeSelfie.disabled = false;
+
+cameraMessage.textContent =
+"Align your face inside the circle and click Take Selfie.";
+
+}catch(err){
+
+cameraMessage.textContent =
+"Camera permission required.";
+
+}
+
+});
+
+
+// TAKE SELFIE
+btnTakeSelfie.addEventListener("click",()=>{
+
+const ctx = canvas.getContext("2d");
+
+const width = 640;
+const height = 480;
+
+canvas.width = width;
+canvas.height = height;
+
+ctx.drawImage(video,0,0,width,height);
+
+const image = canvas.toDataURL("image/jpeg",0.7);
+
+preview.src = image;
+preview.style.display = "block";
+
+selfieDataInput.value = image;
+
+// stop camera
+stream.getTracks().forEach(track=>track.stop());
+video.style.display="none";
+
+btnSubmit.disabled = false;
+
+cameraMessage.textContent =
+"Selfie captured. Now click SUBMIT.";
+
+});
+
+
+// SUBMIT
+signupForm.addEventListener("submit", async(e)=>{
+
+e.preventDefault();
+
+if(!selfieDataInput.value){
+
+formMessage.textContent =
+"Please capture selfie first.";
+return;
+
+}
+
+const payload = {
+
+employeeId: employeeInput.value,
+selfieData: selfieDataInput.value
+
+};
+
+try{
+
+const res = await fetch(
+"http://localhost:3000/api/public/signup",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(payload)
+});
+
+const data = await res.json();
+
+formMessage.textContent =
+"Selfie submitted successfully.";
+
+}catch(err){
+
+formMessage.textContent =
+"Network error.";
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
