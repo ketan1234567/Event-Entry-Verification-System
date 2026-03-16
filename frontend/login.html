@@ -197,7 +197,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
+     <script>
+        // API URL Configuration
+        const API_URL = 'http://localhost:3000';
+
         // Toggle Password Visibility
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
@@ -212,21 +215,64 @@
         });
 
         // Form Submit Handler
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             const btn = document.querySelector('.btn-login');
             
-            // Simulate Login
+            // UI Loading State
+            const originalBtnText = btn.innerHTML;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...';
             btn.disabled = true;
-            
-            setTimeout(() => {
-                // Your actual JWT Login Logic Here
-                
-                // Redirect to Dashboard
-                window.location.href = 'admin-dashboard.html';
-            }, 1500);
+
+            try {
+                // 1. Send POST request to Node.js API
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                // 2. Handle Response
+                if (response.ok && data.success) {
+                    // Save Token to Local Storage
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userEmail', data.user.email);
+
+                    // Show success briefly then redirect
+                    btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Success!';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-success');
+
+                    setTimeout(() => {
+                        window.location.href = 'admin-dashboard.html';
+                    }, 1000);
+                } else {
+                    // Show Error
+                    alert(data.message || 'Login failed. Please try again.');
+                    btn.innerHTML = originalBtnText;
+                    btn.disabled = false;
+                }
+
+            } catch (error) {
+    console.error('Error:', error);
+    
+    // Check if the response was not ok and parse text to see HTML errors
+    if (error.message.includes('JSON')) {
+        alert('Server is not responding correctly. Is Node.js running? (Port 3000)');
+    } else {
+        alert('Cannot connect to server.');
+    }
+    
+    btn.innerHTML = originalBtnText;
+    btn.disabled = false;
+}
         });
     </script>
 </body>

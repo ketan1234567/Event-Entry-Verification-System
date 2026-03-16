@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const path = require('path');
 const publicRoutes = require('./routes/publicRoutes');
 
@@ -12,6 +13,8 @@ app.use(cors({
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
+
+app.use(express.json());
 
 // 2. Helmet Configuration (FIX: Allow Cross-Origin Resources)
 // This prevents the browser from blocking the error response JSON
@@ -34,5 +37,14 @@ app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: 'INTERNAL_ERROR' });
 });
+const bcrypt = require('bcryptjs');
+const password = 'admin123';
 
+// bcrypt.hash(password, 10, (err, hash) => {
+//     if (err) throw err;
+//     console.log('--------------------------------');
+//     console.log('Copy this SQL query and run it in your Database:');
+//     console.log(`UPDATE admin SET password = '${hash}' WHERE email = 'admin@ondirect.com';`);
+//     console.log('--------------------------------');
+// });
 module.exports = app;

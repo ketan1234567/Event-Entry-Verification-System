@@ -1,23 +1,35 @@
 const express = require('express');
 const router = express.Router();
+
+// Import Middleware
+const authMiddleware = require('../middleware/authMiddleware');
+
+// Import Controllers
+const { loginCheck } = require('../controllers/loginController');
 const { verifyEmployee } = require('../controllers/publicEmployeeController');
-const { signupSelfie,checkEmployeeId } = require('../controllers/signupController');
+const { signupSelfie, checkEmployeeId } = require('../controllers/signupController');
 const { getEmployeeProfile } = require('../controllers/employeeProfileController');
 const { verifyGateCode } = require('../controllers/gateCodeController');
 const { getEmployeeId } = require('../controllers/getEmployeeIdController');
 
+// ---------------------------------------------------------
+// PUBLIC ROUTES (No Middleware needed)
+// ---------------------------------------------------------
+router.post('/login', loginCheck);          // Anyone can access
+router.post('/signup', signupSelfie);       // Anyone can access
+router.get('/check-employee/:id', checkEmployeeId); // Public check
 
-// NEW: Route to check ID existence
-// GET check employee ID
-router.get('/check-employee/:id', checkEmployeeId);
+// ---------------------------------------------------------
+// PROTECTED ROUTES (Add authMiddleware as 2nd argument)
+// ---------------------------------------------------------
 
-router.get('/employee/profile', getEmployeeProfile);
-router.get('/get-employee-id', getEmployeeId);
-router.post('/gate/verify-code', verifyGateCode);
+// Example: Only logged-in users can verify employees
+router.post('/employee/verify', authMiddleware, verifyEmployee);
 
-router.post('/employee/verify', verifyEmployee);
-router.post('/signup', signupSelfie);
+// Example: Only logged-in users can get profile
+router.get('/employee/profile', authMiddleware, getEmployeeProfile);
 
-// In your Node.js routes file (e.g., routes/public.js)
+router.get('/get-employee-id', authMiddleware, getEmployeeId);
+router.post('/gate/verify-code', authMiddleware, verifyGateCode);
 
 module.exports = router;
