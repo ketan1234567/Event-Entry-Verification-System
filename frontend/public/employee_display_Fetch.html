@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verified | OnDirect</title>
+    <!-- Google Fonts for Tech Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        /* --- Header --- */
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .main-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Verification Box (The black card) --- */
+        .verification-box {
+            background-color: #0a0a0a;
+            border: 1px solid #333;
+            padding: 40px 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1); /* Subtle green glow */
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        /* Green Verified Text */
+        .status-badge {
+            color: #00ff00; /* Bright Green */
+            font-family: 'Roboto Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            display: block;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        /* User Image Circle */
+        .user-image-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #00ff00; /* Green Ring */
+            margin: 0 auto 25px;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+
+        .user-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* Hidden until loaded */
+        }
+
+        /* Placeholder Icon if no image */
+        .user-icon {
+            font-size: 80px;
+            color: #555;
+        }
+
+        /* User Name */
+        .user-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        /* User ID / Details */
+        .user-id {
+            font-size: 16px;
+            color: #888;
+            margin-top: 5px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* --- Action Button --- */
+        .btn-proceed {
+            background-color: #d32f2f; /* Red color like image */
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .btn-proceed:hover {
+            background-color: #b71c1c;
+        }
+
+        /* --- Footer Time --- */
+        .footer-time {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 18px;
+            color: #555;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="logo">ONDIRECT</div>
+        <h1 class="main-title">WELCOME TO RNR 2026 EVENT ENTRY</h1>
+
+        <!-- Verification Box -->
+        <div class="verification-box">
+            <!-- Status -->
+            <span class="status-badge">IDENTITY VERIFIED</span>
+
+            <!-- Image Area -->
+            <div class="user-image-container">
+                <!-- Default Icon (Shown if no image) -->
+                <span class="user-icon" id="userIcon">👤</span>
+                <!-- Actual Image (Hidden by default) -->
+                <img src="" id="userImage" class="user-image" alt="User Photo">
+            </div>
+
+            <!-- Name & ID -->
+            <h2 class="user-name" id="displayName">KETAN DESHMUKH</h2>
+            <div class="user-id" id="displayId">ID: 102875</div>
+        </div>
+
+        <!-- Button -->
+        <button class="btn-proceed" onclick="location.href='verify-qr.html'">
+            PROCEED TOWARDS GATE
+        </button>
+    </div>
+
+    <!-- Time Display -->
+    <div class="footer-time" id="liveTime">7:48:26 PM</div>
+
+    <script>
+        // ==========================================
+        // 1. LIVE CLOCK
+        // ==========================================
+        function updateTime() {
+            const now = new Date();
+            // Format time as H:M:S AM/PM
+            const timeString = now.toLocaleTimeString('en-US', { hour12: true });
+            document.getElementById('liveTime').innerText = timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // ==========================================
+        // 2. DATA LOGIC (FUTURE STEP)
+        // ==========================================
+        
+        // This function simulates setting data. 
+        // Later, you will call this from your verification logic.
+        function setUserData(name, id, imageUrl) {
+            // Set Name
+            document.getElementById('displayName').innerText = name || "VISITOR";
+
+            // Set ID
+            document.getElementById('displayId').innerText = id ? `ID: ${id}` : "";
+
+            // Set Image
+            const imgTag = document.getElementById('userImage');
+            const iconTag = document.getElementById('userIcon');
+
+            if (imageUrl) {
+                imgTag.src = imageUrl;
+                imgTag.style.display = 'block';
+                iconTag.style.display = 'none';
+            } else {
+                imgTag.style.display = 'none';
+                iconTag.style.display = 'block';
+            }
+        }
+
+        // ==========================================
+        // EXAMPLE: Reading data from URL
+        // If you redirect from verify-qr.html like:
+        // verification-success.html?name=Rahul&id=101&img=url
+        // ==========================================
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        const id = urlParams.get('id');
+        const img = urlParams.get('img');
+
+        if (name) {
+            setUserData(name, id, img);
+        }
+    </script>
+</body>
+</html>

@@ -1,35 +1,46 @@
-// GET /get-employee-id - fetch employee ID and name from employees (signup) table
-const pool = require('../config/db'); // You named it 'pool'
+const pool = require('../config/db');
 
-async function getEmployeeId(req, res) {
-    const { employeeId } = req.query;
 
-    if (!employeeId) {
-        return res.status(400).json({ error: 'Employee ID is required' });
+
+
+async function checkEmployeeExists(req, res) {
+
+    // const { emp_id } = req.params.id;
+
+    const emp_id = req.params.id;
+
+//console.log(emp_id);
+
+    if (!emp_id) {
+        return res.status(400).json({
+            message: "Employee ID is required"
+        });
     }
 
     try {
-        // Correct SQL query
-        const query = 'SELECT employeeId, name FROM employees WHERE employeeId = ?';
-        
-        // ✅ FIX: Use 'pool' here, not 'db'
-        const [rows] = await pool.query(query, [employeeId]);
+        // ✅ UPDATED: Added 'id' to the SELECT list
+        const [rows] = await pool.query(
+            "SELECT id, emp_id, name, photo FROM employees WHERE emp_id = ?",
+            [emp_id]
+        );
 
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'Employee not found' });
+        if (rows.length > 0) {
+            return res.json({
+                exists: true,
+                employee: rows[0] // Now returns: { id, emp_id, name, photo }
+            });
         }
 
-        const employee = rows[0];
-
         res.json({
-            employeeId: employee.employeeId,
-            name: employee.name 
+            exists: false
         });
 
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Database error' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Database error"
+        });
     }
 }
 
-module.exports = { getEmployeeId };
+module.exports = { checkEmployeeExists };

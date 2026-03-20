@@ -199,7 +199,7 @@
     
      <script>
         // API URL Configuration
-        const API_URL = 'http://localhost:3000';
+        const API_URL = 'http://localhost:3232';
 
         // Toggle Password Visibility
         const togglePassword = document.getElementById('togglePassword');
@@ -229,7 +229,7 @@
 
           try {
     // 1. Send POST request to Node.js API (Corrected URL)
-    const response = await fetch('http://localhost:3000/api/public/login', {
+    const response = await fetch('http://localhost:3232/api/public/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -262,7 +262,7 @@
 
 } catch (error) {
     console.error('Error:', error);
-    alert('Cannot connect to server. Make sure Node.js is running on port 3000.');
+    alert('Cannot connect to server. Make sure Node.js is running on port 3232.');
     btn.innerHTML = originalBtnText;
     btn.disabled = false;
 }

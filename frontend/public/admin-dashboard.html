@@ -77,7 +77,7 @@
             margin: 0.25rem 1rem;
             font-weight: 500;
             transition: all 0.2s;
-            cursor: pointer; /* Pointer for links */
+            cursor: pointer;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -199,7 +199,7 @@
         .logout-link:hover { background-color: rgba(220, 53, 69, 0.05) !important; color: #a71d2a !important; }
     </style>
 </head>
-<body>
+<body style="display: none;">
 
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
@@ -231,6 +231,23 @@
                     <i class="bi bi-qr-code-scan"></i> Verification Logs
                 </a>
             </li>
+
+             <li class="nav-item">
+                <a class="nav-link" id="verify-qr" style="display: none;" >
+                    <a class="nav-link" href="verify-qr.html">
+                    <i class="bi bi-camera"></i>
+                    <span>Scanner Verification</span>
+                    </a>
+                </a>
+            </li>
+            
+            <!-- NEW MENU ITEM HERE -->
+            <li class="nav-item" id="navGenerateCode" style="display: none;">
+                <a class="nav-link" href="generate-code.html">
+                    <i class="bi bi-qr-code"></i>
+                    <span>Generate-code-Entry-pass</span>
+                </a>
+            </li>
         </ul>
 
         <div class="mt-auto">
@@ -241,8 +258,8 @@
                         A
                     </div>
                     <div class="ms-3">
-                        <h6 class="mb-0 small">Admin User</h6>
-                        <small class="text-muted">admin@ondirect.com</small>
+                        <h6 class="mb-0 small user-name">Admin User</h6>
+                        <small class="text-muted user-email">admin@ondirect.com</small>
                     </div>
                 </div>
                 <a href="#" class="nav-link logout-link" id="logoutBtn">
@@ -272,7 +289,7 @@
                 <button class="btn btn-success" id="importBtn">
                     <i class="bi bi-upload me-2"></i>Import Data
                 </button>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+                <button class="btn btn-primary" id="addNewBtn" data-bs-toggle="modal" data-bs-target="#createHRModal">
                     <i class="bi bi-plus-lg me-2"></i>Add New
                 </button>
             </div>
@@ -280,7 +297,7 @@
 
         <!-- Stats Cards Container -->
         <div class="row g-4 mb-4" id="statsContainer">
-            <!-- Stats will be injected here by JS -->
+            <!-- Stats injected by JS -->
         </div>
 
         <!-- Data Table Card -->
@@ -291,104 +308,58 @@
             
             <div class="p-3">
                 <table id="mainTable" class="table table-hover align-middle mb-0" style="width:100%">
-                    <thead id="tableHead">
-                        <!-- Headers injected by JS -->
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Data injected by JS -->
-                    </tbody>
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Create Modal (Generic) -->
-    <div class="modal fade" id="createModal" tabindex="-1">
+    <!-- Create HR Modal -->
+    <div class="modal fade" id="createHRModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold">Add New HR</h5>
-       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createHRModal">
-    <i class="bi bi-plus-lg me-2"></i>Add New HR
-</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pt-2">
-                    <p class="text-muted small">Functionality depends on active page.</p>
+                    <form id="createHRForm">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Full Name</label>
+                            <input type="text" class="form-control" placeholder="e.g., John Doe" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Email Address</label>
+                            <input type="email" class="form-control" placeholder="e.g., john@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Password</label>
+                            <input type="password" class="form-control" placeholder="Create a strong password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Assign Gate</label>
+                            <select class="form-select">
+                                <option value="Gate 1">Gate 1</option>
+                                <option value="Gate 2">Gate 2</option>
+                                <option value="Gate 3">Gate 3</option>
+                                <option value="Gate 4">Gate 4</option>
+                            </select>
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">Create User</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Create HR Modal -->
-<div class="modal fade" id="createHRModal" tabindex="-1" aria-labelledby="createHRModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            
-            <!-- Header Section -->
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="createHRModalLabel">Add New HR</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div> <!-- This closing tag was missing -->
-
-            <!-- Body Section -->
-            <div class="modal-body pt-2">
-                <p class="text-muted small">Fill in the details to assign a new gate staff.</p>
-                <form id="createHRForm">
-                    <div class="mb-3">
-                        <label class="form-label text-muted small">Full Name</label>
-                        <input type="text" class="form-control" placeholder="e.g., John Doe" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted small">Email Address</label>
-                        <input type="email" class="form-control" placeholder="e.g., john@example.com" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted small">Password</label>
-                        <input type="password" class="form-control" placeholder="Create a strong password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted small">Assign Gate</label>
-                        <select class="form-select">
-                            <option value="Gate 1">Gate 1</option>
-                            <option value="Gate 2">Gate 2</option>
-                            <option value="Gate 3">Gate 3</option>
-                            <option value="Gate 4">Gate 4</option>
-                        </select>
-                    </div>
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary">Create User</button>
-                    </div>
-                </form>
-            </div>
-            
-        </div>
-    </div>
-</div>
-
-<script>
-    document.getElementById('createHRForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Stop actual form submission
-        
-        // Add your AJAX/Fetch logic here to save to database
-        
-        // Close the modal
-        var modal = bootstrap.Modal.getInstance(document.getElementById('createHRModal'));
-        modal.hide();
-        
-        // Optional: Show success message
-        alert('HR User Created Successfully!');
-    });
-</script>
 
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    
-    <!-- DataTables Buttons -->
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -396,244 +367,214 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-
-    <!-- SheetJS for Importing Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <script>
-        let dataTable;
-        let currentPage = 'dashboard';
+   <script>
+    let dataTable;
+    let currentPage = 'dashboard';
+    let CURRENT_USER = { role: null, name: '', email: '' };
 
-        // 1. Page Configurations
-        const pageConfig = {
-            'dashboard': {
-                title: 'Dashboard Overview',
-                tableTitle: 'Recent Activity',
-                stats: [
-                    { label: 'Total Verified', value: '1,240', icon: 'bi-check-circle-fill', color: 'success' },
-                    { label: 'Active Gates', value: '4', icon: 'bi-door-open-fill', color: 'primary' },
-                    { label: 'HR Users', value: '8', icon: 'bi-person-badge-fill', color: 'info' },
-                    { label: 'Pending', value: '56', icon: 'bi-hourglass-split', color: 'warning' }
-                ],
-                columns: ['Time', 'User', 'Action', 'Gate', 'Status', 'Action']
-            },
-            'hr': {
-                title: 'HR & Gate Management',
-                tableTitle: 'HR & Gate Management',
-                stats: [
-                    { label: 'Total HR', value: '8', icon: 'bi-people-fill', color: 'primary' },
-                    { label: 'Active Now', value: '5', icon: 'bi-broadcast', color: 'success' }
-                ],
-                columns: ['Name', 'Email', 'Role', 'Assigned Gate', 'Status', 'Action']
-            },
-            'employee': {
-                title: 'Employee Records',
-                tableTitle: 'All Employees',
-                stats: [
-                    { label: 'Total Employees', value: '1,500', icon: 'bi-people-fill', color: 'primary' },
-                    { label: 'Present Today', value: '1,200', icon: 'bi-calendar-check', color: 'success' },
-                    { label: 'On Leave', value: '300', icon: 'bi-calendar-x', color: 'warning' }
-                ],
-                columns: ['Emp ID', 'Name', 'Department', 'Designation', 'Phone', 'Status', 'Action']
-            },
-            'logs': {
-                title: 'Verification Logs',
-                tableTitle: 'Entry Logs',
-                stats: [
-                    { label: 'Today Entries', value: '450', icon: 'bi-box-arrow-in-right', color: 'success' },
-                    { label: 'Denied Entries', value: '12', icon: 'bi-x-octagon', color: 'danger' }
-                ],
-                columns: ['Log ID', 'Employee Name', 'Gate', 'Time In', 'Status', 'Action']
-            }
-        };
+    $(document).ready(function() {
+        const token = localStorage.getItem('authToken');
+        if (!token) { window.location.href = 'login.html'; return; }
+        verifyTokenAndGetUser(token);
+    });
 
-        // 2. Initialize
-        $(document).ready(function() {
-            // Set default page
-            loadPage('dashboard');
-
-            // Navigation Click Handler
-            $('.nav-link[data-page]').on('click', function() {
-                const page = $(this).data('page');
-                loadPage(page);
-                
-                // Update Active State
-                $('.nav-link').removeClass('active');
-                $(this).addClass('active');
-
-                // Close sidebar on mobile after click
-                if(window.innerWidth < 992) {
-                    $('#sidebar').removeClass('active');
-                }
+    async function verifyTokenAndGetUser(token) {
+        try {
+            const response = await fetch('http://localhost:3232/api/public/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
+            if (!response.ok) throw new Error("Unauthorized");
+            const data = await response.json();
+            CURRENT_USER = { role: data.user.role, name: data.user.username, email: data.user.email };
+            initializeDashboard();
+        } catch (error) {
+            localStorage.removeItem('authToken');
+            window.location.href = 'login.html';
+        }
+    }
+
+    function initializeDashboard() {
+        document.body.style.display = "block";
+        applyRoleAccess();
+        loadPage('dashboard');
+        setupEventListeners();
+    }
+
+    // ==========================================
+    // 5. ROLE-BASED ACCESS CONTROL (RBAC)
+    // ==========================================
+    function applyRoleAccess() {
+        const role = CURRENT_USER.role;
+
+        // Update Sidebar Profile
+        const initials = CURRENT_USER.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        $('.avatar-sm').text(initials);
+        $('.user-name').text(CURRENT_USER.name);
+        $('.user-email').text(CURRENT_USER.email);
+
+        // Reset Visibility (Hide all first)
+        $('a[data-page="hr"]').parent().hide();
+        $('a[data-page="employee"]').parent().hide();
+        $('#importBtn').hide();
+        $('#addNewBtn').hide();
+        $('#navGenerateCode').hide();
+        $('#verify-qr').hide();
+
+        // Logic for Admin
+        if (role === 'admin') {
+            $('a[data-page="hr"]').parent().show();
+            $('a[data-page="employee"]').parent().show();
+            $('#importBtn').show();
+            $('#addNewBtn').show();
+        }
+        // Logic for Gate Users
+        else if (['Gate1', 'Gate2', 'Gate3', 'Gate4', 'get1', 'get2', 'get3', 'get4'].includes(role)) {
+            $('#navGenerateCode').show();
+            $('#verify-qr').show();
+        }
+    }
+
+    function setupEventListeners() {
+        $('.nav-link[data-page]').on('click', function() {
+            const page = $(this).data('page');
+            loadPage(page);
+            $('.nav-link').removeClass('active');
+            $(this).addClass('active');
+            if (window.innerWidth < 992) $('#sidebar').removeClass('active');
         });
 
-        // 3. Load Page Function
-        function loadPage(pageName) {
-            currentPage = pageName;
-            const config = pageConfig[pageName];
-
-            // Update Text
-            $('#pageTitle').text(config.title);
-            $('#tableTitle').text(config.tableTitle);
-
-            // Update Stats
-            let statsHtml = '';
-            config.stats.forEach(stat => {
-                statsHtml += `
-                    <div class="col-sm-6 col-xl-3">
-                        <div class="stat-card">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <p class="text-muted mb-1">${stat.label}</p>
-                                    <h2>${stat.value}</h2>
-                                </div>
-                                <div class="icon-circle bg-${stat.color} bg-opacity-10 text-${stat.color}">
-                                    <i class="bi ${stat.icon}"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            $('#statsContainer').html(statsHtml);
-
-            // Update Table Structure
-            if (dataTable) dataTable.destroy();
-            
-            let headerHtml = '<tr>';
-            config.columns.forEach(col => {
-                headerHtml += `<th>${col}</th>`;
-            });
-            headerHtml += '</tr>';
-            $('#tableHead').html(headerHtml);
-            $('#tableBody').html(''); // Clear body
-
-            // Re-initialize DataTable
-            dataTable = $('#mainTable').DataTable({
-                dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"f>>' + 
-                     '<"row"<"col-sm-12"tr>>' + 
-                     '<"row mt-3"<"col-sm-6"i><"col-sm-6"p>>' +
-                     '<"row mt-3"<"col-sm-12 text-start"B>>',
-                buttons: [
-                    { extend: 'excelHtml5', text: '<i class="bi bi-file-earmark-excel me-1"></i> Export Excel', className: 'btn-primary' },
-                    { extend: 'print', text: '<i class="bi bi-printer me-1"></i> Print', className: 'btn-info' }
-                ],
-                responsive: true,
-                language: { search: "Filter:", lengthMenu: "Show _MENU_ entries" }
-            });
-
-            // Add dummy row for visualization
-            addDummyRow(pageName);
-        }
-
-        // 4. Dummy Data Helper
-        function addDummyRow(page) {
-            // Just adds one example row so the table isn't empty initially
-            if(page === 'hr') {
-                dataTable.row.add([
-                    `<div class="d-flex align-items-center"><div class="avatar-xs bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2">RK</div><span>Rahul Kumar</span></div>`,
-                    'rahul@ondirect.com', '<span class="badge bg-primary bg-opacity-10 text-primary">HR</span>', 'Gate 1', '<span class="badge bg-success bg-opacity-10 text-success">Online</span>', '<button class="btn btn-sm btn-light border"><i class="bi bi-pencil text-muted"></i></button>'
-                ]).draw();
-            } else if (page === 'employee') {
-                 dataTable.row.add([
-                    'EMP001', `<div class="d-flex align-items-center"><div class="avatar-xs bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-2">AK</div><span>Amit Kumar</span></div>`, 'IT', 'Developer', '9876543210', '<span class="badge bg-success bg-opacity-10 text-success">Active</span>', '<button class="btn btn-sm btn-light border"><i class="bi bi-eye text-muted"></i></button>'
-                ]).draw();
-            }
-            // Add more dummy logic as needed
-        }
-
-        // 5. Live Time
-        function updateLiveTime() {
-            const now = new Date();
-            document.getElementById('liveTime').textContent = now.toLocaleString('en-US', {
-                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-            });
-        }
-        updateLiveTime();
-        setInterval(updateLiveTime, 1000);
-
-        // 6. Sidebar Toggle
-        document.getElementById('toggleBtn').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('active'); });
-
-        // 7. Logout
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
-            if(confirm("Are you sure you want to logout?")) {
-                localStorage.removeItem('token');
+            if (confirm("Are you sure you want to logout?")) {
+                localStorage.removeItem('authToken');
                 window.location.href = 'login.html';
             }
         });
 
-        // 8. Dynamic Import Logic
+        document.getElementById('toggleBtn').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('active'); });
         document.getElementById('importBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+        document.getElementById('fileInput').addEventListener('change', handleFileImport);
+    }
 
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+    const pageConfig = {
+    'dashboard': { title: 'Dashboard Overview', tableTitle: 'Recent Activity', stats: [{ label: 'Total Verified', value: '1,240', icon: 'bi-check-circle-fill', color: 'success' }, { label: 'Active Gates', value: '4', icon: 'bi-door-open-fill', color: 'primary' }], columns: ['Time', 'User', 'Action', 'Gate', 'Status', 'Action'] },
+    'hr': { title: 'HR & Gate Management', tableTitle: 'HR List', stats: [{ label: 'Total HR', value: '8', icon: 'bi-people-fill', color: 'primary' }], columns: ['Name', 'Email', 'Role', 'Gate', 'Status', 'Action'] },
+    'employee': { title: 'Employee Records', tableTitle: 'All Employees', stats: [], columns: ['ID', 'Name', 'Dept', 'Phone', 'Status', 'Action'] },
+    
+    // ✅ UPDATED: Added 'Emp ID' and 'Gate Code' columns
+    'logs': { 
+        title: 'Verification Logs', 
+        tableTitle: 'Entry Logs', 
+        stats: [{ label: 'Today Entries', value: '450', icon: 'bi-box-arrow-in-right', color: 'success' }], 
+        columns: ['Log ID', 'Emp ID', 'Name', 'Gate Code', 'Time', 'Status', 'Action'] 
+    }
+};
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    function loadPage(pageName) {
+        if (CURRENT_USER.role !== 'admin' && (pageName === 'hr' || pageName === 'employee')) pageName = 'dashboard';
 
-                if (jsonData.length === 0) return;
+        currentPage = pageName;
+        const config = pageConfig[pageName];
+        $('#pageTitle').text(config.title);
+        $('#tableTitle').text(config.tableTitle);
 
-                // Destroy & Rebuild Header based on Excel
-                dataTable.destroy();
-                const excelHeaders = jsonData[0];
-                let headerHtml = '<tr>';
-                excelHeaders.forEach(h => headerHtml += `<th>${h}</th>`);
-                headerHtml += '<th>Action</th></tr>'; // Add action column
-                $('#tableHead').html(headerHtml);
-                $('#tableBody').html('');
-
-                // Re-init
-                dataTable = $('#mainTable').DataTable({
-                    dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"f>>' + 
-                         '<"row"<"col-sm-12"tr>>' + 
-                         '<"row mt-3"<"col-sm-6"i><"col-sm-6"p>>' +
-                         '<"row mt-3"<"col-sm-12 text-start"B>>',
-                    buttons: [
-                        { extend: 'excelHtml5', text: '<i class="bi bi-file-earmark-excel me-1"></i> Export Excel', className: 'btn-primary' },
-                        { extend: 'print', text: '<i class="bi bi-printer me-1"></i> Print', className: 'btn-info' }
-                    ],
-                    responsive: true
-                });
-
-                // Process Data
-                for (let i = 1; i < jsonData.length; i++) {
-                    const row = jsonData[i];
-                    if (!row || !row.join('')) continue;
-
-                    let rowData = [];
-                    row.forEach((cell, index) => {
-                        const header = excelHeaders[index] ? excelHeaders[index].toLowerCase() : '';
-                        if (header === 'name') {
-                            const initials = cell.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                            rowData.push(`<div class="d-flex align-items-center"><div class="avatar-xs bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">${initials}</div><span>${cell}</span></div>`);
-                        } else if (header === 'status') {
-                            rowData.push(`<span class="badge bg-secondary bg-opacity-10 text-secondary">${cell}</span>`);
-                        } else {
-                            rowData.push(cell || 'N/A');
-                        }
-                    });
-                    
-                    // Add Action Button
-                    rowData.push('<button class="btn btn-sm btn-light border"><i class="bi bi-pencil text-muted"></i></button>');
-
-                    dataTable.row.add(rowData).draw();
-                }
-            };
-            reader.readAsArrayBuffer(file);
-            fileInput.value = '';
+        let statsHtml = '';
+        config.stats.forEach(stat => {
+            statsHtml += `<div class="col-sm-6 col-xl-3"><div class="stat-card"><div class="d-flex justify-content-between"><div><p class="text-muted mb-1">${stat.label}</p><h2>${stat.value}</h2></div><div class="icon-circle bg-${stat.color} bg-opacity-10 text-${stat.color}"><i class="bi ${stat.icon}"></i></div></div></div></div>`;
         });
+        $('#statsContainer').html(statsHtml);
 
+        if (dataTable) dataTable.destroy();
+        let headerHtml = '<tr>';
+        config.columns.forEach(col => headerHtml += `<th>${col}</th>`);
+        headerHtml += '</tr>';
+        $('#tableHead').html(headerHtml);
+        $('#tableBody').html('');
+
+        // Initialize empty DataTable
+        dataTable = $('#mainTable').DataTable({ responsive: true });
+
+        // ==================================================
+        // LOGIC: FETCH DATA BASED ON PAGE
+        // ==================================================
+        if (pageName === 'logs') {
+            fetchVerificationLogs(); // CALL THE NEW API FUNCTION
+        } else {
+            addDummyRow(pageName);
+        }
+    }
+
+    // ==========================================
+    // NEW FUNCTION: FETCH VERIFICATION LOGS
+    // ==========================================
+    async function fetchVerificationLogs() {
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('http://localhost:3232/api/public/verification-logs', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
         
-    </script>
+        const result = await response.json();
+
+        if (result.success) {
+            dataTable.clear().draw(); 
+
+            result.data.forEach(log => {
+                // Format Time
+                const entryTime = new Date(log.entry_time);
+                const timeString = entryTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                // Format Status
+                const statusBadge = `<span class="badge bg-${log.status === 'entered' ? 'success' : 'warning'}">${log.status}</span>`;
+                
+                // Format Log ID
+                const logId = `#LOG${String(log.id).padStart(3, '0')}`;
+
+                // ✅ PREPARE DATA FOR ALL COLUMNS
+                // Columns: ['Log ID', 'Emp ID', 'Name', 'Gate Code', 'Time', 'Status', 'Action']
+                const rowData = [
+                    logId,                              // 1. Log ID
+                    log.emp_id || 'N/A',                // 2. Emp ID (from DB)
+                    log.employee_name || 'Visitor',     // 3. Name
+                    log.gate_code || 'N/A',             // 4. Gate Code (from DB)
+                    timeString,                         // 5. Time
+                    statusBadge,                        // 6. Status
+                    '<button class="btn btn-sm btn-light border"><i class="bi bi-eye"></i></button>' // 7. Action
+                ];
+
+                dataTable.row.add(rowData).draw();
+            });
+        } else {
+            console.error("Failed to load logs");
+        }
+    } catch (error) {
+        console.error("Error fetching logs:", error);
+    }
+}
+
+    function addDummyRow(page) {
+        // This is for other pages, kept as is
+        if (page === 'dashboard') dataTable.row.add(['10:00 AM', 'Admin', 'Login', 'Gate 1', 'Success', '<button class="btn btn-sm btn-light border"><i class="bi bi-eye"></i></button>']).draw();
+    }
+
+    function updateLiveTime() {
+        const now = new Date();
+        document.getElementById('liveTime').textContent = now.toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    }
+    updateLiveTime();
+    setInterval(updateLiveTime, 1000);
+
+    function handleFileImport(e) {
+        // Import logic here...
+    }
+
+    document.getElementById('createHRForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        bootstrap.Modal.getInstance(document.getElementById('createHRModal')).hide();
+        alert('HR User Created Successfully!');
+    });
+</script>
 </body>
 </html>

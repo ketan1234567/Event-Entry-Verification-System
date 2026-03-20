@@ -1,0 +1,56 @@
+
+Get_code_verification_method 
+
+1) First screen when emplyee id Enter  that time it say if it present it only say  true orhwise employee is exits
+
+1) Get_api
+
+Response:-
+{
+    "exists": false
+}
+
+URL http://localhost:3000/api/public/check-employee?emp_id=103310
+
+controller_name:getEmployeeIdController and Function name checkEmployeeExists
+
+2) second step when we enter id it will comes name and images show this api below 
+
+
+1) Get_api
+
+
+Response
+
+{
+    "exists": true,
+    "employee": {
+        "id": 3,
+        "emp_id": "102875",
+        "name": "Ketan Deshmukh",
+        "photo": "https://example.com/photos/102875.jpg"
+    }
+}
+
+URL http://localhost:3000/api/public/check-employee?emp_id=103310
+
+3)  if we are using verify-code get verify code goes succesffuly windos
+
+2) Post_api 
+
+getPasssgenerateController funtion name verifyCode
+
+URL http://localhost:3000/api/public/verify-code
+
+
+
+
+
+
+
+
+
+
+
+
+

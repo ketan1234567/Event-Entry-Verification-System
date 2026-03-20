@@ -51,4 +51,76 @@ const loginCheck = async (req, res) => {
     }
 };
 
-module.exports = { loginCheck };
+// --- NEW FUNCTION TO ADD ---
+const getMe = async (req, res) => {
+    try {
+        // req.user is set by the authMiddleware
+        const user = req.user; 
+
+        // Optionally fetch fresh data from DB
+        const [rows] = await pool.query('SELECT id, username, email, role FROM admin WHERE id = ?', [user.id]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.json({ 
+            success: true, 
+            user: rows[0] 
+        });
+
+    } catch (error) {
+        console.error('GetMe Error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+const getVerificationLogs = async (req, res) => {
+    try {
+        // ✅ UPDATED SQL: Join using 'emp_id' instead of 'id'
+        const sql = `
+            SELECT 
+                el.id, 
+                el.employee_id, 
+                el.entry_time, 
+                el.status, 
+                el.gate_code, 
+                e.name AS employee_name,
+                e.emp_id
+            FROM entry_logs el
+            LEFT JOIN employees e ON el.employee_id = e.emp_id 
+            ORDER BY el.entry_time DESC
+        `;
+
+        const [rows] = await pool.query(sql);
+
+        const formattedLogs = rows.map(log => {
+            // If name is still null, display Visitor
+            const displayName = log.employee_name || 'Visitor';
+            const logId = `#LOG${String(log.id).padStart(3, '0')}`;
+
+            return {
+                ...log,
+                employee_name: displayName,
+                log_id: logId
+            };
+        });
+
+        res.json({
+            success: true,
+            data: formattedLogs
+        });
+
+    } catch (error) {
+        console.error("Error fetching logs:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+    }
+};
+
+module.exports = { getVerificationLogs };
+
+
+module.exports = { loginCheck,getMe,getVerificationLogs };

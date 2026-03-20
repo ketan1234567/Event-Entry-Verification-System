@@ -1,28 +1,27 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const path = require('path');
 const publicRoutes = require('./routes/publicRoutes');
-
+require("dotenv").config();
 const app = express();
 
 // 1. CORS Configuration
+// ADDED 'Authorization' to allowedHeaders so the token can be sent
 app.use(cors({
-  origin: '*', // Allow all origins for development
+  origin: '*',
   methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'Authorization'] 
 }));
 
-app.use(express.json());
-
-// 2. Helmet Configuration (FIX: Allow Cross-Origin Resources)
-// This prevents the browser from blocking the error response JSON
+// 2. Helmet Configuration
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
-// Increase request size limit for selfie uploads
+// 3. Body Parser Middleware
+// FIX: Removed the duplicate app.use(express.json())
+// Only keep this one with the limit
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
@@ -32,19 +31,16 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 // Routes
 app.use('/api/public', publicRoutes);
 
+// NEW: For dashboard verification (Fixed typo: publicRout -> publicRoutes)
+app.use('/api/auth', publicRoutes);
+
+
+
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ error: 'INTERNAL_ERROR' });
 });
-const bcrypt = require('bcryptjs');
-const password = 'admin123';
 
-// bcrypt.hash(password, 10, (err, hash) => {
-//     if (err) throw err;
-//     console.log('--------------------------------');
-//     console.log('Copy this SQL query and run it in your Database:');
-//     console.log(`UPDATE admin SET password = '${hash}' WHERE email = 'admin@ondirect.com';`);
-//     console.log('--------------------------------');
-// });
 module.exports = app;

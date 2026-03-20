@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate QR</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input { padding: 10px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+    button:disabled { background: #cccccc; cursor: not-allowed; }
+    #qr { margin-top: 20px; border: 1px solid #ddd; padding: 10px; display: none; }
+  </style>
+</head>
+<body>
+
+<h2>Generate Entry QR</h2>
+
+<input type="text" id="emp_id" placeholder="Enter Employee ID">
+
+<br><br>
+
+<button onclick="generateQR()" id="genBtn">Generate QR</button>
+
+<br><br>
+
+<!-- Hidden by default until QR is generated -->
+<img id="qr" width="200" style="display:none;">
+
+<script>
+async function generateQR(){
+  const emp_id = document.getElementById("emp_id").value;
+  const btn = document.getElementById("genBtn");
+  const qrImg = document.getElementById("qr");
+
+  if(!emp_id){
+    alert("Please enter Employee ID");
+    return;
+  }
+
+  // Start Loading State
+  btn.disabled = true;
+  btn.innerText = "Generating...";
+  qrImg.style.display = "none";
+
+  try{
+    const response = await fetch("http://localhost:3232/api/public/generate-qr",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        emp_id: emp_id
+      })
+    });
+
+    const data = await response.json();
+
+    if(data.success){
+      qrImg.src = data.qr_code;
+      qrImg.style.display = "block"; // Show image
+    } else {
+      alert("Error: " + data.message);
+    }
+
+  } catch(error){
+    console.error(error);
+    alert("Server connection error");
+  } finally {
+    // Reset Button
+    btn.disabled = false;
+    btn.innerText = "Generate QR";
+  }
+}
+</script>
+
+</body>
+</html>
